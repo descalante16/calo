@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "94918049363",
+    "project_id": "calorie-check-c786c",
+    "storage_bucket": "calorie-check-c786c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94918049363:android:5c160cd16c7b68e966d0a6",
+        "android_client_info": {
+          "package_name": "com.example.calorie_check"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "94918049363-q2ipf60h5deeg1cnil8mo1sombcloe5j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.calorie_check",
+            "certificate_hash": "4adc158ca4c235622445396319c66c7852701847"
+          }
+        },
+        {
+          "client_id": "94918049363-iqhflufchh3j73somiakq0bun97fhmok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3r5p4r1QUCCurOFJWeuuZIDBBvLTY874"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "94918049363-iqhflufchh3j73somiakq0bun97fhmok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "94918049363-d36m88gu2fokqbv5sd8l8vnnfvieph9o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.calorieCheck"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

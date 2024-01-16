@@ -1,9 +1,20 @@
 import 'package:calorie_check/components/continue_button.dart';
 import 'package:calorie_check/screens/activity_level.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class PersonalInfoForm extends StatefulWidget {
-  const PersonalInfoForm({super.key});
+  final String userId;
+  final String email;
+  final String activityLevel;
+
+  const PersonalInfoForm({
+    Key? key,
+    required this.userId,
+    required this.email,
+    required this.activityLevel,
+  }) : super(key: key);
 
   @override
   _PersonalInfoFormState createState() => _PersonalInfoFormState();
@@ -12,13 +23,68 @@ class PersonalInfoForm extends StatefulWidget {
 class _PersonalInfoFormState extends State<PersonalInfoForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  String firstname = '';
-  String lastname = '';
-  String suffix = '';
-  double height = 0.0;
-  double weight = 0.0;
-  int age = 0;
+  TextEditingController _firstNameController = TextEditingController();
+  TextEditingController _lastNameController = TextEditingController();
+  TextEditingController _suffixController = TextEditingController();
+  TextEditingController _heightController = TextEditingController();
+  TextEditingController _weightController = TextEditingController();
+  TextEditingController _ageController = TextEditingController();
+
   String sex = '';
+
+  void _handlePersonalInfoFormSubmission() async {
+    // Handle the form submission logic here
+
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    try {
+      // Reference to the 'users' collection in Firestore
+      final CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+
+      // Update user information in the 'users' collection
+      await users.doc(userId).update({
+        'firstname': _firstNameController.text,
+        'lastname': _lastNameController.text,
+        'suffix': _suffixController.text,
+        'height': double.parse(_heightController.text),
+        'weight': double.parse(_weightController.text),
+        'age': int.parse(_ageController.text),
+        'sex': sex,
+        'email': widget.email,
+        'activityLevel': widget.activityLevel,
+      });
+
+      // Navigate to the next step in the registration process
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ActivityLevelForm(
+                onSubmit: _handleActivityLevelFormSubmission)),
+      );
+    } catch (e) {
+      print("Error updating user data in Firestore: $e");
+    }
+  }
+
+  void _handleActivityLevelFormSubmission(String selectedLevel) async {
+    // Handle the form submission logic here
+
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    try {
+      // Reference to the 'users' collection in Firestore
+      final CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+
+      // Update user information in the 'users' collection
+      await users.doc(userId).update({
+        'activityLevel': selectedLevel,
+      });
+    } catch (e) {
+      print("Error updating user data in Firestore: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +117,7 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
                   ),
                 ),
                 TextFormField(
+                  controller: _firstNameController,
                   decoration: InputDecoration(labelText: 'First Name'),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -59,10 +126,11 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
                     return null;
                   },
                   onSaved: (value) {
-                    firstname = value!;
+                    _firstNameController.text = value!;
                   },
                 ),
                 TextFormField(
+                  controller: _lastNameController,
                   decoration: InputDecoration(labelText: 'Last Name'),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -71,16 +139,18 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
                     return null;
                   },
                   onSaved: (value) {
-                    lastname = value!;
+                    _lastNameController.text = value!;
                   },
                 ),
                 TextFormField(
+                  controller: _suffixController,
                   decoration: InputDecoration(labelText: 'Suffix (optional)'),
                   onSaved: (value) {
-                    suffix = value!;
+                    _suffixController.text = value!;
                   },
                 ),
                 TextFormField(
+                  controller: _heightController,
                   decoration: InputDecoration(labelText: 'Height (cm)'),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -89,10 +159,11 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
                     return null;
                   },
                   onSaved: (value) {
-                    height = double.parse(value!);
+                    _heightController.text = value!;
                   },
                 ),
                 TextFormField(
+                  controller: _weightController,
                   decoration: InputDecoration(labelText: 'Weight (kg)'),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -101,10 +172,11 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
                     return null;
                   },
                   onSaved: (value) {
-                    weight = double.parse(value!);
+                    _weightController.text = value!;
                   },
                 ),
                 TextFormField(
+                  controller: _ageController,
                   decoration: InputDecoration(labelText: 'Age'),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -113,7 +185,7 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
                     return null;
                   },
                   onSaved: (value) {
-                    age = int.parse(value!);
+                    _ageController.text = value!;
                   },
                 ),
                 Padding(
@@ -152,7 +224,12 @@ class _PersonalInfoFormState extends State<PersonalInfoForm> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ActivityLevelForm()),
+                          builder: (context) => ActivityLevelForm(
+                            onSubmit: (selectedLevel) =>
+                                _handleActivityLevelFormSubmission(
+                                    selectedLevel),
+                          ),
+                        ),
                       );
                     }
                   },

@@ -1,7 +1,11 @@
+import 'package:calorie_check/screens/login.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ActivityLevelForm extends StatefulWidget {
-  const ActivityLevelForm({super.key});
+  final Function(String) onSubmit;
+  const ActivityLevelForm({Key? key, required this.onSubmit});
 
   @override
   _ActivityLevelFormState createState() => _ActivityLevelFormState();
@@ -21,6 +25,36 @@ class _ActivityLevelFormState extends State<ActivityLevelForm> {
     'Extra Active Exercise'
   ];
 
+  void _handleActivityLevelFormSubmission(String selectedLevel) async {
+    // Handle the form submission logic here
+
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+    if (selectedLevel.isNotEmpty) {
+      // Invoke the callback with the selected level
+      widget.onSubmit(selectedLevel);
+    }
+
+    try {
+      // Reference to the 'users' collection in Firestore
+      final CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+
+      // Update user information in the 'users' collection
+      await users.doc(userId).update({
+        'activityLevel': selectedLevel,
+      });
+
+      // Navigate to the home screen or another destination
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LogInPage()),
+      );
+    } catch (e) {
+      print("Error updating user data in Firestore: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +69,7 @@ class _ActivityLevelFormState extends State<ActivityLevelForm> {
         ),
       ),
       body: Form(
+        key: formKey,
         child: Column(
           children: [
             Container(
@@ -81,7 +116,10 @@ class _ActivityLevelFormState extends State<ActivityLevelForm> {
                 onPressed: () {
                   var isFormValid = formKey.currentState!.validate();
                   if (isFormValid) {
-                    // Save to database
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LogInPage()),
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(
